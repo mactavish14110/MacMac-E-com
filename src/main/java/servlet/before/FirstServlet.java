@@ -1,0 +1,39 @@
+package servlet.before;
+
+import service.AdminService;
+import service.BeforeUserService;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+
+@WebServlet(name = "first", urlPatterns = { "/before_first" })
+public class FirstServlet extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+	protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		String typeid = request.getParameter("typeid");//获得商品类型
+		AdminService as = new AdminService();
+		BeforeUserService bs = new BeforeUserService();
+		//把登录存储到session中
+		HttpSession session = request.getSession(true);
+		//获得商品类型
+		List<Map<String, Object>>  list = as.getGoodsType();
+		session.setAttribute("goodsType", list);
+		//获得最新商品
+		List<Map<String, Object>>  lastedlist = bs.getLastedGoods(typeid);
+		//获得销售排行商品
+		List<Map<String, Object>>  salelist = bs.getSaleOrder();
+		request.setAttribute("lastedlist", lastedlist);
+		request.setAttribute("salelist", salelist);
+		RequestDispatcher rds = request.getRequestDispatcher("beforeUser/index.jsp");
+		rds.forward(request, response);
+	}
+}
